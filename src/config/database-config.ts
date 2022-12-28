@@ -16,9 +16,9 @@ export const dataSource = new DataSource({
     //database name
     database: process.env.DB_NAME,
     //path to database models
-    entities: [path.join(__dirname, "../models/*.ts")],
+    entities: [path.join(__dirname, "../models/index.ts")],
     //path to migrations folder
-    migrations: [path.join(__dirname, "../migrations/*.ts")],
+    migrations: [path.join(__dirname, "../../migrations/*.ts")],
     //define a table "database_migrations" to hold database migrations
     migrationsTableName: "database_migration",
     //use database synchronization only in development
@@ -28,3 +28,4 @@ export const dataSource = new DataSource({
     logging: process.env.NODE_ENV === "production" ? false : true,
 })
 
+// export default dataSource
