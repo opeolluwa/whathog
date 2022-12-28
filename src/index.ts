@@ -1,6 +1,5 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client'
 import morgan from "morgan";
 import helmet from "helmet";
 import cors from "cors";
@@ -11,7 +10,6 @@ dotenv.config();
 
 const app: Express = express()
 const port = process.env.PORT || 8045;
-const prisma = new PrismaClient();
 
 // all middleware
 app.use(express.json())
