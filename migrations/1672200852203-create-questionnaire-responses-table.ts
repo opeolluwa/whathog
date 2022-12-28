@@ -1,16 +1,17 @@
-import { MigrationInterface, QueryRunner , Table} from "typeorm"
+import { MigrationInterface, QueryRunner, Table } from "typeorm"
 
 export class createQuestionnaireResponsesTable1672200852203 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         //create table 
         const questionnaireResponseTable = new Table({
-            name:"questionnaire_response",
+            name: "questionnaire_response",
             columns: [
                 {
                     name: "id",
-                    type: "uuid",
-                    isPrimary: true,
+                    type: "varchar(36)", //uuid
+                    isPrimary: true, //set as primary key
+                    isNullable: false,
                 },
                 {
                     name: "response",
