@@ -24,6 +24,7 @@ export const dataSource = new DataSource({
     //use database synchronization only in development
     // synchronize: (process.env.NODE_ENV === "production") ? false : true,
     synchronize: false,
+    ssl: String(process.env.DB_HOST) === "localhost" ? false : true,
     //allow logging in development only mode only
     logging: process.env.NODE_ENV === "production" ? false : true,
 })
