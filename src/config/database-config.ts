@@ -1,0 +1,35 @@
+import { DataSource } from "typeorm";
+import dotenv from "dotenv";
+import path from "path"
+
+
+dotenv.config();
+const migrationPath = path.join(__dirname, process.env.NODE_ENV !== 'production' ? '../migrations/*.js' : '../migrations/*.ts');
+const modelPath = path.join(__dirname, process.env.NODE_ENV !== 'production' ? "../models/index.js" : "../models/index.ts");
+
+
+export const dataSource = new DataSource({
+    //the database driver see https://typeorm.io/#installation for other allowed values and setup
+    type: "postgres",
+    //the database host name, default to localhost
+    host: String(process.env.DB_HOST) ? String(process.env.DB_HOST) : "localhost",
+    //the database username
+    username: process.env.DB_USER,
+    //database password is the database access key
+    password: process.env.DB_PASS,
+    //database name
+    database: process.env.DB_NAME,
+    //path to database models
+    entities: [modelPath],
+    //path to migrations folder
+    migrations: [migrationPath],
+    //define a table "database_migrations" to hold database migrations
+    migrationsTableName: "database_migration",
+    //use database synchronization only in development
+    // synchronize: (process.env.NODE_ENV === "production") ? false : true,
+    synchronize: false,
+    //allow logging in development only mode only
+    logging: process.env.NODE_ENV === "production" ? false : true,
+})
+
+// export default dataSource
