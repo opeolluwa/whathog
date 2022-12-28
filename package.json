@@ -2,7 +2,7 @@
   "name": "whathog",
   "version": "1.0.0",
   "description": "Backend of A bilingual mobile application the the awareness and prevention of child abuse",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "build": "tsc && npm run db:migrate",
