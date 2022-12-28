@@ -88,7 +88,7 @@ export default class Controllers {
                 code: 200,
                 message: "responses successfully fetched",
                 data: {
-                    response: response.data.choices
+                    reply: response.data.choices[0]
                 }
             })
         } catch (error) {
