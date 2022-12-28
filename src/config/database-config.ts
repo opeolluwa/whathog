@@ -2,11 +2,7 @@ import { DataSource } from "typeorm";
 import dotenv from "dotenv";
 import path from "path"
 
-
 dotenv.config();
-const migrationPath = path.join(__dirname, process.env.NODE_ENV !== 'production' ? '../migrations/*.js' : '../migrations/*.ts');
-const modelPath = path.join(__dirname, process.env.NODE_ENV !== 'production' ? "../models/index.js" : "../models/index.ts");
-
 
 export const dataSource = new DataSource({
     //the database driver see https://typeorm.io/#installation for other allowed values and setup
@@ -20,9 +16,9 @@ export const dataSource = new DataSource({
     //database name
     database: process.env.DB_NAME,
     //path to database models
-    entities: [modelPath],
+    entities: [path.join(__dirname, "../models/index.ts")],
     //path to migrations folder
-    migrations: [migrationPath],
+    migrations: [path.join(__dirname, "../migrations/*.ts")],
     //define a table "database_migrations" to hold database migrations
     migrationsTableName: "database_migration",
     //use database synchronization only in development
