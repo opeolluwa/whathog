@@ -13,7 +13,7 @@ export default class Controllers {
             // validation rules
             if (!question || !answer) {
                 return res.status(400).json({
-                    status: "success",
+                    status: "error",
                     code: 400,
                     message: "bad request",
                     data: null
