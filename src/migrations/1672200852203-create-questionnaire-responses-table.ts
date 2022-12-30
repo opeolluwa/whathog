@@ -14,7 +14,11 @@ export class createQuestionnaireResponsesTable1672200852203 implements Migration
                     isNullable: false,
                 },
                 {
-                    name: "response",
+                    name: "answer",
+                    type: "text",
+                },
+                {
+                    name: "question",
                     type: "text",
                 },
             ]

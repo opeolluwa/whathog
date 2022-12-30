@@ -9,15 +9,25 @@ const ResponseModel = dataSource.getRepository(ResponseSchema);
 export default class Controllers {
     static async saveResponse(req: Request, res: Response) {
         try {
-            const { message } = req.body;
+            const { question, answer } = req.body;
+            // validation rules
+            if (!question || !answer) {
+                return res.status(400).json({
+                    status: "success",
+                    code: 400,
+                    message: "bad request",
+                    data: null
+                })
+            }
             const newResponse = new ResponseSchema();
-            newResponse.response = message;
+            newResponse.question = question;
+            newResponse.answer = answer;
             newResponse.id = uuid();
             await ResponseModel.save(newResponse);
             return res.status(201).json({
                 status: "success",
                 code: 201,
-                message: "responses successfully created",
+                message: "responses successfully recorded",
                 data: {
                     newResponse
                 }
@@ -60,8 +70,8 @@ export default class Controllers {
         if (!req.body) {
             return res.status(400).send({
                 status: "error",
-                code: 400, 
-                message:"missing payload"
+                code: 400,
+                message: "missing payload"
             })
         }
         try {
