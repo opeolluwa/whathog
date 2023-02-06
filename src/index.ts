@@ -5,6 +5,7 @@ import helmet from "helmet";
 import cors from "cors";
 import { dataSource } from './config/database-config';
 import router from './routes';
+import authRoutes from "./routes/auth";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time�
 app.use(cors());
 app.use(helmet());
 app.use("/api/v1/", router)
+app.use("/api/v1/auth", authRoutes)
+
 
 
 app.get('/', (req: Request, res: Response) => {

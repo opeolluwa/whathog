@@ -158,8 +158,8 @@ export class UserAuthControllers {
              * finally, send mail to user containing the otp
              */
             //save the otp id to the user's database, referencing the user that requested for reset
-            const otpObject = await OtpGenerator.generate(6)
-            console.log(otpObject)
+            const otp = await OtpGenerator.generate(6)
+            console.log(otp)
 
             // user.otpId = otpObject?.id
             AppDataSource.manager.save(user)
@@ -168,7 +168,7 @@ export class UserAuthControllers {
                 email: email,
                 subject: "Reset your password",
                 template: "reset-password",
-                data: { firstname: user.firstname, otp: otpObject?.otp },
+                data: { firstname: user.firstname, otp },
             })
             //send feedback to client application the otp has been sent to the user's email
             return res.send({ success: true, message: "OTP sent to your email" })
