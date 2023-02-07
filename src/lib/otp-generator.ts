@@ -10,7 +10,7 @@ export class OtpGenerator {
   static async generate(
     length = 6,
     options: any = { upperCaseAlphabets: false, specialChars: false }
-  ): Promise<Number> {
+  ): Promise<String> {
     //generate new otp and save it to database, return the otp id to the user controller that called the library
     return new Promise(async (resolve, reject) => {
       try {

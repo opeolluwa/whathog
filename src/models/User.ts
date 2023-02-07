@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 
-@Entity("questionnaire_response")
+@Entity("whathog_user_information")
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id!: string | undefined
@@ -18,7 +18,7 @@ export class User {
     password: string | undefined
 
     @Column({ type: "text" })
-    otpId: String | undefined
+    otp: String  | undefined
 
     @Column({ type: "text" })
     status: String | undefined //verified, unverifiefd

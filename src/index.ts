@@ -19,7 +19,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time�
 app.use(cors());
 app.use(helmet());
 app.use("/api/v1/", router)
-app.use("/api/v1/auth", authRoutes)
+app.use("/v1/auth", authRoutes)
 
 
 

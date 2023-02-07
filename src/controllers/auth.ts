@@ -7,6 +7,7 @@ import { OtpGenerator } from "../lib/otp-generator"
 import { Jwt } from "../lib/jwt"
 import * as EmailValidator from "email-validator"
 import bcrypt from "bcrypt"
+import { v4 as uuidv4 } from 'uuid';
 
 const UserInformationSource = AppDataSource.getRepository(UserModel)
 export class UserAuthControllers {
@@ -20,7 +21,7 @@ export class UserAuthControllers {
             let error: any = {
 
             }
-            // validationn 
+            // validations 
             if (!email) {
                 error.email = "Email is required"
             }
@@ -58,11 +59,17 @@ export class UserAuthControllers {
 
             //create new record
             const user = new UserModel()
+            user.id = uuidv4();
             user.email = email
             user.password = await bcrypt.hash(password, 13)
             user.firstname = firstname
             user.lastname = lastname
+            user.otp = await OtpGenerator.generate(6);
+            user.status = "unverified"
+            await AppDataSource.manager.save(user);
             const token = await Jwt.encode({ id: user.id, email: user.email })
+            console.log(user.otp);
+
             // send mail to user containing magic link to verify email address
             await Mailer.sendMail({
                 email: email,
@@ -70,15 +77,15 @@ export class UserAuthControllers {
                 template: "confirm-email",
                 data: {
                     firstname: user.firstname,
-                    magicLink: `${process.env.FRONTEND_URL}/auth/confirm-email/${token}`,
+                    otp: user.otp
                 },
             })
-            console.log(`${process.env.APP_URL}/auth/confirm-email/${token}`)
             return res.send({
                 success: true,
-                message:
-                    "User created successfully, please confirm your email to proceed",
-                data: null,
+                message: "User created successfully, please confirm your email to proceed",
+                data: {
+                    token
+                }
             })
         } catch (error) {
             console.log(error.message)
@@ -90,37 +97,82 @@ export class UserAuthControllers {
         }
     }
 
-
-    //to confirm the user's email address, verify the jwt sent to the user's email address and if it is valid, set the user's account to verified
-    static async confirmEmail(req: Request, res: Response) {
-        const { token } = req.params
-        const decoded = await Jwt.decode(token)
-        console.log(decoded)
-
-        const { id, email } = decoded
-        //if  token has not expired
+    static async requestNewToken(req: Request, res: Response) {
         try {
+            const { email } = req.app.get("user")
             const user = await AppDataSource.getRepository(UserModel).findOneBy({
-                id,
+                email: email || req.body.email,
             })
             if (!user) {
                 return res.status(404).send({
-                    message: "user not found",
+                    message: "user not found ",
                     success: false,
                     code: 404
                 })
             }
-            if (user.email !== email) {
-                return res.status(401).send({
-                    message: "unauthorized access",
-                    code: 401,
-                    success: false
+            user.otp = await OtpGenerator.generate(6);
+            await AppDataSource.manager.save(user);
+            return res.send({
+                success: false,
+                message: "token successfully generated",
+                data: null,
+            });
+            
+        } catch (error) {
+            console.log(error.message)
+            return res.status(500).send({
+                success: false,
+                message: (error as Error).message,
+                data: null,
+            })
+        }
+    }
+    //confirm the otp and if it is valid, set the user's password to the new password
+    static async verifyOtp(req: Request, res: Response) {
+        const { otp } = req.body
+        const { email } = req.app.get("user")
+        //trim of excessive spacing  then split the header into header + token
+
+        try {
+            const user = await AppDataSource.getRepository(UserModel).findOneBy({
+                email,
+            })
+            if (!user) {
+                return res.status(404).send({
+                    message: "user not found ",
+                    success: false,
+                    code: 404
                 })
             }
-            //update the user status to verified
-            // user.status = UserAccountStatus.VERIFIED
+            if (!user.otp) {
+                return res.status(400).send({
+                    message: "invalid or expired OTP",
+                    success: false,
+                    code: 400
+                })
+            }
+
+            if (user.otp.trim() !== otp.trim()) {
+                return res.status(400).send({
+                    message: "invalid or expired OTP",
+                    success: false,
+                    code: 400
+                })
+            }
+            /**
+             * confirm the otp and if it is valid,  then
+             * invalidate the otp and send jwt containing user email and id to the client application,
+             * the token will be used to authenticate the user for password reset where it will be passed as authorization header*/
+
+            user.otp = null
+            user.status = "verified";
             await AppDataSource.manager.save(user)
-            return res.send({ success: true, message: "Email verified successfully" })
+            const payload = await Jwt.encode({ id: user.id, email: user.email })
+            return res.send({
+                success: true,
+                message: "OTP verified",
+                bearerToken: payload,
+            })
         } catch (error) {
             console.log(error.message)
             return res.status(500).send({
@@ -182,64 +234,7 @@ export class UserAuthControllers {
         }
     }
 
-    //confirm the otp and if it is valid, set the user's password to the new password
-    static async verifyOtp(req: Request, res: Response) {
-        const { email } = req.body
-        try {
-            const user = await AppDataSource.getRepository(UserModel).findOneBy({
-                email,
-            })
-            if (!user) {
-                return res.status(404).send({
-                    message: "user not found ",
-                    success: false,
-                    code: 404
-                })
-            }
-            /* if (!user.otpId) {
-                return res.status(404).send({
-                    message: "user not found ",
-                    success: false,
-                    code: 404
-                })
-            } */
-            /**
-             * confirm the otp and if it is valid,  then
-             * invalidate the otp and send jwt containing user email and id to the client application,
-             * the token will be used to authenticate the user for password reset where it will be passed as authorization header
-             */
-            /*  const hasTokenExpired = await OtpGenerator.verify(user.otpId)
-             if (hasTokenExpired) {
-                 return res.status(422).send({
-                     message: "Invalid er expired token",
-                     success: false,
-                 })
-             } */
-            //invalidate the otp
-            /*  const usedOtp = await OtpGenerator.invalidate(user.otpId)
-             if (!usedOtp) {
-                 return res.status(500).send({
-                     message: "error validation the OTP",
-                     success: false
-                 })
-             } */
-            user.otpId = ""
-            AppDataSource.manager.save(user)
-            const payload = await Jwt.encode({ id: user.id, email: user.email })
-            return res.send({
-                success: true,
-                message: "OTP verified",
-                bearerToken: payload,
-            })
-        } catch (error) {
-            console.log(error.message)
-            return res.status(500).send({
-                success: false,
-                message: (error as Error).message,
-                data: null,
-            })
-        }
-    }
+
 
     /**
      * to set new password for the user,

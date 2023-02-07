@@ -16,7 +16,7 @@ export const dataSource = new DataSource({
     //database name
     database: process.env.DB_NAME,
     //path to database models
-    entities: [path.join(__dirname, "../models/index.ts")],
+    entities: [path.join(__dirname, "../models/*.ts")],
     //path to migrations folder
     migrations: [path.join(__dirname, "../migrations/*.ts")],
     //define a table "database_migrations" to hold database migrations

@@ -25,7 +25,7 @@ export class createUserAccoutTable1675704427014 implements MigrationInterface {
                     type: "text"
                 },
                 {
-                    name: "otpId",
+                    name: "otp",
                     type: "text"
                 },
                 {
