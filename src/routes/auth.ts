@@ -7,7 +7,8 @@ const router = express.Router();
 router.post("/sign-up", UserAuthControllers.signUp);
 router.post("/verify-otp", AuthorizationMiddleware.verifyAuthToken,
     UserAuthControllers.verifyOtp);
-router.get("/login", UserAuthControllers.login)
+router.get("/request-new-otp", AuthorizationMiddleware.verifyAuthToken, UserAuthControllers.requestNewToken)
+router.post("/login", UserAuthControllers.login)
 router.post("/logout", UserAuthControllers.logout)
 router.post("/req-password-reset", UserAuthControllers.forgotPassword)
 router.get("/me", UserAuthControllers.getUserProfile)

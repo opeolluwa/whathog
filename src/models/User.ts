@@ -18,7 +18,7 @@ export class User {
     password: string | undefined
 
     @Column({ type: "text" })
-    otp: String  | undefined
+    otp: String | undefined
 
     @Column({ type: "text" })
     status: String | undefined //verified, unverifiefd

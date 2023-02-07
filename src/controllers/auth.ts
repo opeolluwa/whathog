@@ -111,13 +111,16 @@ export class UserAuthControllers {
                 })
             }
             user.otp = await OtpGenerator.generate(6);
+            const token = await Jwt.encode({ id: user.id, email: user.email })
             await AppDataSource.manager.save(user);
             return res.send({
                 success: false,
                 message: "token successfully generated",
-                data: null,
+                data: {
+                    token
+                },
             });
-            
+
         } catch (error) {
             console.log(error.message)
             return res.status(500).send({
