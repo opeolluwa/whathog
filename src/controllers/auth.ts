@@ -197,6 +197,13 @@ export class UserAuthControllers {
      */
     static async forgotPassword(req: Request, res: Response) {
         const { email } = req.body
+        if (!email) {
+            return res.status(400).send({
+                message: "email is required",
+                code: 400,
+                success: false
+            })
+        }
         try {
             const user = await AppDataSource.getRepository(UserModel).findOneBy({
                 email,
@@ -216,19 +223,31 @@ export class UserAuthControllers {
              */
             //save the otp id to the user's database, referencing the user that requested for reset
             const otp = await OtpGenerator.generate(6)
+            user.otp = otp;
             console.log(otp)
 
             // user.otpId = otpObject?.id
             AppDataSource.manager.save(user)
             //send the mail
-            Mailer.sendMail({
+             await Mailer.sendMail({
                 email: email,
-                subject: "Reset your password",
+                subject: "Password Reset",
                 template: "reset-password",
-                data: { firstname: user.firstname, otp },
+                data: {
+                    firstname: user.firstname,
+                    otp: user.otp,
+                    currentYear: new Date().getFullYear()
+                },
             })
+            const token = await Jwt.encode({ id: user.id, email: user.email })
             //send feedback to client application the otp has been sent to the user's email
-            return res.send({ success: true, message: "OTP sent to your email" })
+            return res.send({
+                success: true,
+                message: "OTP sent to your email",
+                data: {
+                    token,
+                }
+            })
         } catch (error: any) {
             console.log(error.message)
             return res.status(500).send({
