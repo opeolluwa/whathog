@@ -18,8 +18,8 @@ export class Mailer {
   static async sendMail(options: Options) {
     try {
       const transporter = nodemailer.createTransport({
-        // service: 'gmail',
-        host: process.env.MAIL_HOST,
+        service: 'gmail',
+        // host: process.env.MAIL_HOST,
         // port: 465,
         // secure: true,
         auth: {
@@ -34,7 +34,7 @@ export class Mailer {
         options.data
       )
       const message = {
-        from: `Opeoluwa from sample project <${String(process.env.SMTP_USER)}>`,
+        from: `Ezekiel from Child Abuse Awareness App <${String(process.env.SMTP_USER)}>`,
         replyTo: process.env.SMTP_USER,
         to: options.email,
         subject: options.subject,

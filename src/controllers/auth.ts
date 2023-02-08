@@ -71,20 +71,22 @@ export class UserAuthControllers {
             console.log(user.otp);
 
             // send mail to user containing magic link to verify email address
-            await Mailer.sendMail({
+            const mailer = await Mailer.sendMail({
                 email: email,
                 subject: "Confirm your email address",
                 template: "confirm-email",
                 data: {
                     firstname: user.firstname,
-                    otp: user.otp
+                    otp: user.otp,
+                    currentYear: new Date().getFullYear()
                 },
             })
             return res.send({
                 success: true,
                 message: "User created successfully, please confirm your email to proceed",
                 data: {
-                    token
+                    token,
+                    mailer
                 }
             })
         } catch (error) {
