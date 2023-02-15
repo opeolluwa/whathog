@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 app.use(cors());
 app.use(helmet());
-app.use("/api/v1/", router)
+app.use("/v1/", router)
 app.use("/v1/auth", authRoutes)
 
 
